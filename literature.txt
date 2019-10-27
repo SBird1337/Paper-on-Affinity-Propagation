@@ -1,0 +1,1 @@
+Non-metric affinity propagation for unsupervised image categorization ( http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.85.3411&rep=rep1&type=pdf )
