@@ -5,3 +5,7 @@ Markov clustering versus affinity propagation for the partitioning of protein in
 Fingerprint indoor positioning algorithm based on affinity propagation clustering (https://jwcn-eurasipjournals.springeropen.com/track/pdf/10.1186/1687-1499-2013-272)
 
 Clustering by passing messages between data points ( https://science.sciencemag.org/content/sci/315/5814/972.full.pdf )
+
+Fast Algorithm for Affinity Propagation ( https://www.aaai.org/ocs/index.php/IJCAI/IJCAI11/paper/view/2884/3676 )
+
+Optimization of travelling salesman problem using affinity propagation clustering and genetic algorithm ( https://www.degruyter.com/downloadpdf/j/jaiscr.2015.5.issue-4/jaiscr-2015-0032/jaiscr-2015-0032.pdf )
