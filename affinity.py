@@ -6,13 +6,13 @@ from sklearn.datasets.samples_generator import make_blobs
 
 # #############################################################################
 # Generate sample data
-centers = [[1, 1], [-1, -1], [1, -1]]
-X, labels_true = make_blobs(n_samples=300, centers=centers, cluster_std=0.5,
+centers = [[10, 10], [-10, -10], [10, -10], [-10,10], [5,5], [-5,5], [5,-5], [-5,-5]]
+X, labels_true = make_blobs(n_samples=1000, centers=centers, cluster_std=1,
                             random_state=0)
 
 # #############################################################################
 # Compute Affinity Propagation
-af = AffinityPropagation(preference=-50).fit(X)
+af = AffinityPropagation(preference=-2000, max_iter=1000, damping=0.9).fit(X)
 cluster_centers_indices = af.cluster_centers_indices_
 labels = af.labels_
 

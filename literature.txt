@@ -1,1 +1,7 @@
-Non-metric affinity propagation for unsupervised image categorization ( http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.85.3411&rep=rep1&type=pdf )
+Non-metric affinity propagation for unsupervised image categorization ( http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.85.3411&rep=rep1&type=pdf ) LIG
+
+Markov clustering versus affinity propagation for the partitioning of protein interaction graphs ( https://bmcbioinformatics.biomedcentral.com/track/pdf/10.1186/1471-2105-10-99 )
+
+Fingerprint indoor positioning algorithm based on affinity propagation clustering (https://jwcn-eurasipjournals.springeropen.com/track/pdf/10.1186/1687-1499-2013-272)
+
+Clustering by passing messages between data points ( https://science.sciencemag.org/content/sci/315/5814/972.full.pdf )
