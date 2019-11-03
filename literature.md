@@ -26,6 +26,6 @@ Frey et al. already mention how AP could be used in biomedical applications, spe
 
 This paper is a direct application of the AP clustering algorithm. It describes and proposes indoor positioning using reference points of WLAN data. The results show an improvement through several metrics in comparison to previous algorithms.
 
-### Optimization of traveling salesman problem using affinity propagation clustering and genetic algorithm
+### Optimization of traveling salesman problem using affinity propagation clustering and genetic algorithm (El-Samak, Ahmad Fouad and Ashour, Wesam)
 
 Sounding a bit obscure at first, this tries to solve one of the classic np-complete problems, the TSP problem, using AP clustering. It makes use of genetic algorithms, which where used before to optimize TSP, and shows that AP can improve those results both in the error of the produced solution, as well as the computational time based on different data sets.
