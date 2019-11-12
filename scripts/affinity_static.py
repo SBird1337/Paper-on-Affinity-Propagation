@@ -6,10 +6,24 @@ from sklearn.datasets.samples_generator import make_blobs
 
 # #############################################################################
 # Generate sample data
-centers = [[10, 10], [-10, -10], [10, -10], [-10,10], [5,5], [-5,5], [5,-5], [-5,-5]]
-X, labels_true = make_blobs(n_samples=1000, centers=centers, cluster_std=1,
+centers = [[1,1], [-1,-1], [1,-1]]
+X, labels_true = make_blobs(n_samples=100, centers=centers, cluster_std=0.1,
                             random_state=0)
 
+# #############################################################################
+# Plot initial
+import matplotlib.pyplot as plt
+from itertools import cycle
+import tikzplotlib
+
+plt.close('all')
+plt.figure(1)
+plt.clf()
+
+for p in X:
+    plt.plot(p[0], p[1], 'k.')
+plt.title('Unclustered dataset')
+tikzplotlib.save("figures/ap_unclust.tex")
 # #############################################################################
 # Compute Affinity Propagation
 af = AffinityPropagation(max_iter=1000, damping=0.5).fit(X)
@@ -32,11 +46,9 @@ print("Silhouette Coefficient: %0.3f"
 
 # #############################################################################
 # Plot result
-import matplotlib.pyplot as plt
-from itertools import cycle
 
 plt.close('all')
-plt.figure(1)
+plt.figure(2)
 plt.clf()
 
 colors = cycle('bgrcmykbgrcmykbgrcmykbgrcmyk')
@@ -50,4 +62,4 @@ for k, col in zip(range(n_clusters_), colors):
         plt.plot([cluster_center[0], x[0]], [cluster_center[1], x[1]], col)
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
-plt.show()
+tikzplotlib.save("figures/ap_clust.tex")
