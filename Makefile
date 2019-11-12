@@ -7,6 +7,7 @@ all:
 clean:
 	make -C paper clean
 	make -C presentation clean
+	rm -rf se-scientific.tar.gz
 
 cleanaux:
 	make -C paper cleanaux
