@@ -138,7 +138,7 @@
 \end{frame}
 
 \begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
-	To begin, the \alert{availability matrix} is initialized to $a(i,k) = 0_{i,k}$.
+	To begin, the \alert{availability matrix} is initialized to $a(i,k) = 0$.
 	
 	The \alert{responsibility} $r(i,k)$ sent from point $i$ to point $k$ reflects how suited point $k$ is to serve as an exemplar for point $i$. It is updated in each step:
 	
@@ -161,7 +161,7 @@
 \end{frame}
 
 \begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
-    The "self-availability" $r(k,k)$ reflects accumulated evidence that point $k$ is an exemplar, based on positive responsibilities sent to $k$ from other points. It is updated differently:
+    The "\alert{self-availability}" $a(k,k)$ reflects accumulated evidence that point $k$ is an exemplar, based on positive responsibilities sent to $k$ from other points. It is updated differently:
     
     \begin{block}{Updating the self-availability}
     	\begin{center}
@@ -173,7 +173,7 @@
 \begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
 	After the message passing terminates, \alert{availabilities} and \alert{responsabilities} can be combined to identify exemplars and clusters.
 	
-	The value that maximizes $a(i,j) + r(i,j)$ eighter identifies point $i$ as an exemplar if $i=k$ or identifies the data point that is the exemplar for point $i$.
+	The value that maximizes $a(i,k) + r(i,k)$ eighter identifies point $i$ as an exemplar if $i=k$ or identifies the data point that is the exemplar for point $i$.
 \end{frame}
 \begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
 	In order to reduce numerical oscilations in the message-passing process, a damping factor $\lambda$ shall be used to dampen the messages by setting them to $\lambda$ times its previous value plus $1-\lambda$ times its prescribed updated value in each iteration. $\lambda \in [0,1]$.
