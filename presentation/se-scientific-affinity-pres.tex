@@ -62,18 +62,16 @@
 
 \subsection[Overview]{Overview}
 \begin{frame}[fragile]
-  \frametitle{Clustering}
-  \framesubtitle{Overview\footnote{\cite{kaufman2009finding}}}
+  \frametitle{Clustering: Overview\footnote{\cite{kaufman2009finding}}}
   \begin{itemize}
   	\item Cluster Analysis is the art of finding groups in data. 
   	\item To do so, we need to specify a similarity criterion (e.g. the euclidian distance as a metric)
-  	\item We want to automize this clustering process.
+  	\item We want to automatize this clustering process.
   	
   \end{itemize}
 \end{frame}
 \begin{frame}[fragile]
-\frametitle{Clustering}
-\framesubtitle{Overview}
+\frametitle{Clustering: Overview}
 \begin{figure}
 	\centering
 	\scalebox{0.65}{
@@ -85,8 +83,7 @@
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Clustering}
-\framesubtitle{Overview}
+\frametitle{Clustering: Overview}
 \begin{figure}
 	\centering
 	\scalebox{0.65}{
@@ -97,31 +94,35 @@
 \end{figure}
 \end{frame}
 
-\subsection[classical]{Solutions}
+\subsection[classical]{Algorithms}
 \begin{frame}
-  \frametitle{Clustering}
-  \framesubtitle{Solutions}
-  Many solutions exist to solve the clustering problem, one of the more popular ones is \emph{k-means}. \cite{frey2007clustering}
+  \frametitle{Clustering: Algorithms}
+  Many algorithms exist to solve the clustering problem, one of the more popular ones is \emph{k-means}. \cite{frey2007clustering}
   
   This presentation / paper shall discuss \emph{Affinity Propagation} proposed by \cite{frey2007clustering}. 
 \end{frame}
 
 \section{Affinity Propagation}
 \subsection{How it works}
-\begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
+\begin{frame}{Affinity Propagation\footnote{\cite{frey2007clustering}}: Overview}
 	AP can find clusters and their respective \alert{exemplars} (Data points, which act as the center of a cluster, see Figure \ref{fig:clust})
 	
-	AP does not necessarily need a metric, but takes as input a \alert{similarity matrix} $s(i,k)$.
+	AP takes as input the \alert{similarity matrix} $s(i,k)$.
 	
 	In each step, AP updates the message matrices $r(i,k)$ (\alert{responsiblity matrix}) and $a(i,k)$ (\alert{availability matrix})
 	
-	AP's message passing may be terminated at any time, e.g. after a fixed amount of iterations, after changes fall below a threshold or after local decisions stay constant for some number of iterations.
+	Message passing may be terminated at any time, e.g. after:
+	\begin{itemize}
+		\item Fixed amount of iterations
+		\item Changes fall below a threshold
+		\item Local decisions stay constant for some number of iterations
+	\end{itemize}
 \end{frame}
 
-\begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
-	Initially, the similarity matrix has to be set. $s(i,k)$ indicates how suited data point $k$ is to be an exemplar for data point $i$.
+\begin{frame}{Affinity Propagation: Similarity Matrix}
+	Initially, the \alert{similarity matrix} has to be set. $s(i,k)$ indicates how suited data point $k$ is to be an \alert{exemplar} for data point $i$.
 	
-	This can be set individually for each entry, but often you want to use a metric, e.g. the negative squared error (Euclidean distance)
+	Often you want to use a metric, e.g. the negative squared error (\alert{Euclidean distance})
 	
 	\begin{block}{Negative squared error}
 		\begin{center}
@@ -130,18 +131,18 @@
 	\end{block}
 \end{frame}
 
-\begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
+\begin{frame}{Affinity Propagation: Similarity Matrix}
     AP does not need a specified number of clusters.
     
-    Instead it takes the so-called preference values $s(k,k)$ as an input, that describe the log-likelyhood of $x_k$ being an exemplar.
+    Instead it takes the so-called \alert{preference values} $s(k,k)$ as an input, that describe the log-likelihood of $x_k$ being an \alert{exemplar}.
     
-    If each point is equally likely to be an exemplar, this can be set to a common value $s(k,k) = p$.
+    If each point is equally likely to be an \alert{exemplar}, this can be set to a common value $s(k,k) = p$. Frey et al. suggest to use the similarity median for `p`
 \end{frame}
 
-\begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
+\begin{frame}{Affinity Propagation: Responsibility Matrix}
 	To begin, the \alert{availability matrix} is initialized to $a(i,k) = 0$.
 	
-	The \alert{responsibility} $r(i,k)$ sent from point $i$ to point $k$ reflects how suited point $k$ is to serve as an exemplar for point $i$. It is updated in each step:
+	The \alert{responsibility} $r(i,k)$ sent from point $i$ to point $k$ reflects how suited point $k$ is to serve as an \alert{exemplar} for point $i$. It is updated in each step:
 	
 	\begin{block}{Updating the responsibility}
 		\begin{center}
@@ -150,19 +151,19 @@
 	\end{block}
 \end{frame}
 
-\begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
-    The \alert{availability} $a(i,k)$ sent from candidate exemplar $k$ to point $i$ reflects how appropriate it would be for point $i$ to choose $k$ as its exemplar. It is updated after the new \alert{responsability matrix} is calculated:
+\begin{frame}{Affinity Propagation: Availability Matrix}
+    The \alert{availability} $a(i,k)$ sent from candidate \alert{exemplar} $k$ to point $i$ reflects how appropriate it would be for point $i$ to choose $k$ as its \alert{exemplar}. It is updated after the new \alert{responsibility matrix} is calculated:
     
     \begin{block}{Updating the availability}
 		\begin{center}
 			$a(i,k) \leftarrow \mathsf{min}\{0,r(k,k) + \sum\limits_{i^\prime\,\mathsf{s.t.}\, i^\prime \notin \{i,k\}}\mathsf{max}\{0, r(i^{\, \prime} ,k)\}\}$
 		\end{center}
     \end{block}
-	Negative portions of incoming responsabilities are ignored, because a good exemplar only needs to explain some datapoints well.
+	Negative portions of incoming \alert{responsibilities} are ignored, because a good \alert{exemplar} only needs to explain some datapoints well.
 \end{frame}
 
-\begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
-    The "\alert{self-availability}" $a(k,k)$ reflects accumulated evidence that point $k$ is an exemplar, based on positive responsibilities sent to $k$ from other points. It is updated differently:
+\begin{frame}{Affinity Propagation: Self-Availability}
+    The "\alert{self-availability}" $a(k,k)$ reflects accumulated evidence that point $k$ is an \alert{exemplar}, based on positive \alert{responsibilities} sent to $k$ from other points. It is updated differently:
     
     \begin{block}{Updating the self-availability}
     	\begin{center}
@@ -171,40 +172,52 @@
     \end{block}
 \end{frame}
 
-\begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
-	After the message passing terminates, \alert{availabilities} and \alert{responsabilities} can be combined to identify exemplars and clusters.
+\begin{frame}{Affinity Propagation: Gathering Clusters}
+	After the message passing terminates, \alert{availabilities} and \alert{respnsibilities} can be combined to identify \alert{exemplars} and clusters.
 	
-	The value that maximizes $a(i,k) + r(i,k)$ eighter identifies point $i$ as an exemplar if $i=k$ or identifies the data point that is the exemplar for point $i$.
+	The value that maximizes $a(i,k) + r(i,k)$ eighter identifies point $i$ as an \alert{exemplar} if $i=k$ or identifies the data point that is the \alert{exemplar} for point $i$.
 \end{frame}
-\begin{frame}{Affinity Propagation}{How it works\footnote{\cite{frey2007clustering}}}
-	In order to reduce numerical oscilations in the message-passing process, a damping factor $\lambda$ shall be used to dampen the messages by setting them to $\lambda$ times its previous value plus $1-\lambda$ times its prescribed updated value in each iteration. $\lambda \in [0,1]$.
+\begin{frame}{Affinity Propagation: Oscillations}
+	In order to reduce numerical oscillations in the message-passing process, a damping factor $\lambda$ shall be used:
+	\begin{block}{Updating with a damping factor}
+		\begin{center}
+			$M(i,j) =\lambda M(i,j) + (1-\lambda) M^\prime (i,j)$
+		\end{center}
+	\end{block}
+	 for message matrix $M$ and $\lambda\in\left[ 0,1\right]$.
 	
-	The damping factor can be chosen arbitrarily to suit the given dataset / expexted outcome.
+	The damping factor can be chosen arbitrarily to suit the given dataset / expexted outcome. Default: $\lambda = 0.5$.
 \end{frame}
 
-\subsection{Differences to classical solutions}
-\begin{frame}{Affinity Propagation}{Differences to classical solutions\footnote{\cite{frey2007clustering}}}
+\subsection{Differences to classical algorithms}
+\begin{frame}{Affinity Propagation: Differences to classical algorithms}
 	\begin{itemize}
-		\item AP does not need a specified amount of clusters, they emerge from the preferences $s(k,k)$ and the message-passing procedure.
-		\item AP does not need a metric, the similarity matrix can take any real values, and does not need to be symmetric.
-		\item Because of its nature the user needs to play around with the preference values and damping factor in order to achieve a suitable outcome.
+		\item AP does not need a specified amount of clusters.
+		\begin{itemize}
+			\item They emerge from the preference and message-passing.
+		\end{itemize}
+		\item AP does not need a metric.
+		\begin{itemize}
+			\item The \alert{similarity matrix} can take any real values, and does not need to be symmetric.
+		\end{itemize}
+		\item Because of its nature the user needs to play around with the \alert{preference values} and \alert{damping factor} in order to achieve a suitable outcome.
 	\end{itemize}
 \end{frame}
 
 \subsection{Examples}
-\begin{frame}{Affinity Propagation}{Examples}
+\begin{frame}{Affinity Propagation: Example}
 	\begin{center}
 		Video of AP clustering plotted for different iterations
 	\end{center}
 \end{frame}
 
 \subsection{Problems}
-\begin{frame}{Affinity Propagation}{Problems}
-	As seen in the example video, the exemplars tend to oscilate a lot. Those numerical oscillation can lead to long (if ever) convergence times. \cite{frey2007clustering} 
+\begin{frame}{Affinity Propagation: Problems}
+	The matrices tend to oscillate a lot, which can lead to long (if ever) convergence times. \cite{frey2007clustering} 
 	
 	To mitigate that the damping factor $\lambda$ can be used, and preferences can be set accordingly, but its hard to predict exactly what preference values work best. \cite{wang2008adaptive}
 	
-	An adapted algorithm was proposed by Wang et al. - Called Adaptive Affinity Propagation, which adaptively adjusts damping factors to escape oscillations. \cite{wang2008adaptive}
+	An adapted algorithm was proposed by Wang et al. - Called Adaptive Affinity Propagation, which adjusts damping factors to escape oscillations. \cite{wang2008adaptive}
 \end{frame}
 
 \subsection{Applications}

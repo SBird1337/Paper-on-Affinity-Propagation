@@ -6,8 +6,8 @@ from sklearn.datasets.samples_generator import make_blobs
 
 # #############################################################################
 # Generate sample data
-centers = [[1,1], [-1,-1], [1,-1]]
-X, labels_true = make_blobs(n_samples=100, centers=centers, cluster_std=0.1,
+centers = [[0.4,0.4], [-0.4,-0.4], [0.4,-0.4]]
+X, labels_true = make_blobs(n_samples=30, centers=centers, cluster_std=0.1,
                             random_state=0)
 
 # #############################################################################
