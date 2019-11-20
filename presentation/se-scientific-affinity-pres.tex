@@ -219,14 +219,31 @@
 	
 	An adapted algorithm was proposed by Wang et al. - Called Adaptive Affinity Propagation, which adjusts damping factors to escape oscillations. \cite{wang2008adaptive}
 \end{frame}
-
+\begin{frame}{Overcoming Oscillations: Adaptive AP\footnote{\cite{wang2008adaptive}}}
+	A high $\lambda$ will get rid of oscillations, but also slows down message passing.
+	
+	Wang et al. propose an adaptive way to update $\lambda = \lambda+0.05$ if oscillations are detected. A sliding window of size $w$ keeps track of previous values in the message passing.
+	
+	If $\lambda$ reaches a treshold of $0.85$, $p$ is also increased by $p_\Delta$ to escape oscillations.
+\end{frame}
 \subsection{Applications}
 \begin{frame}{Affinity Propagation}{Applications}
 	Frey et al. tried their algorithm on clustering for face images, genes, sentences and airline travel routes, which worked rather well compared to traditional algorithms. \cite{frey2007clustering}
 	
 	Other people have since tried to use AP for a number of different approaches, e.g. fingerprint-based WLAN positioning, as proposed by Tian et al. \cite{tian2013fingerprint}
 \end{frame}
-
+\begin{frame}{Applications: WLAN fingerprinting\footnote{\cite{tian2013fingerprint}}}
+	Tian et al. combine AP clustering with probability based indoor positioning.
+	
+	Their algorithm clusters the \alert{Received Signal Strength} before applying a probability based algorithm.
+	
+	Reduces computation time and errors, because only the cluster's \alert{Exemplar} is used as a reference point.
+\end{frame}
+\begin{frame}{Thank you}
+	Thank you for your attention, for a complete list of results please consider viewing the references.
+	
+	Feel free to ask questions. :)
+\end{frame}
 \begin{frame}{References}
 	\bibliography{../literature/literature}
 \end{frame}
