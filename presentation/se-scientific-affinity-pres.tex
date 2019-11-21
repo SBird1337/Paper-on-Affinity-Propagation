@@ -6,6 +6,7 @@
 
 % corporate design of TU Wien
 \usetheme[font=futura]{tuw}
+
 % background "TU main building" on title page
 %\usetheme[tuw_background]{tuw}
 % individual background on title page
@@ -34,6 +35,7 @@
 \pgfplotsset{compat=1.7}
 \bibliographystyle{apacite}
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}
+\setbeamertemplate{caption}[numbered]
 
 %%% title page settings
 \title[Affinity Propagation]{%
@@ -181,7 +183,7 @@
 	In order to reduce numerical oscillations in the message-passing process, a damping factor $\lambda$ shall be used:
 	\begin{block}{Updating with a damping factor}
 		\begin{center}
-			$M(i,j) =\lambda M(i,j) + (1-\lambda) M^\prime (i,j)$
+			$M^\prime (i,k) =\lambda M_{\mathsf{old}}(i,k) + (1-\lambda) M_{\mathsf{new}} (i,k)$
 		\end{center}
 	\end{block}
 	 for message matrix $M$ and $\lambda\in\left[ 0,1\right]$.
