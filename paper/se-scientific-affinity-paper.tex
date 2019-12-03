@@ -1,10 +1,12 @@
 \documentclass[11pt,a4paper]{article}
 \usepackage{termpaper}
 \usepackage[utf8]{inputenc}
+\usepackage{mathtools}
 
-
+\newtheorem{definition}{Definition}
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
 %opening
-\title{Fill in your paper title here}
+\title{Clustering with Affinity Propagation and its Applications}
 \author{
  \authorname{Philipp-Alexander Auer} \\
  \studentnumber{01420446} \\
@@ -17,20 +19,96 @@
 \maketitle
 
 \begin{abstract}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Abstract...
 \end{abstract}
 
-\section{Section 1}
+\section{Introduction}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Finding groups in data is an important step in many fields of computer science, and already there exist algorithms to solve these problems. One solution to this is the popular k-means, or k-centers algorithm, which iteratively refines a randomly selected initial set of clusters. This method comes with the constraint that a user has to specify the initial amount of clusters, and is very sensitive to that parameter. \cite{frey2007clustering} 
+Affinity Propagation is a clustering algorithm proposed by Frey et al. in 2007. It uses a message passing model between data points to form a collection of exemplars (See Definition \ref{def:exemplar}) and respective clusters. \cite{frey2007clustering} Affinity Propagation tries to solve the problem without needing to know the number of clusters beforehand, by only supplying a similarity criterion.
+While the proposed method performs better for many tested applications \cite{frey2007clustering} and has very good general applicability, there are a number of problems that occur when strictly following the procedure, one of them being numerical oscillations in the message passing procedure. Wang et al. try to tackle this with their adaptive version of the algorithm, which changes parameters on the fly, to achieve better results and convergance times. \cite{wang2008adaptive} With the original implemetation of Affinity Propagation and some further improvements, the procedure promises to be a valid applicant to tackle modern problems that require a form of uninformed clustering on different data sets. Tian et al. propose a probability distribution-aided algorithm to perform fingerprint indoor positioning in WLAN networks, which is based on an initial Affinity Propagation Clustering. Their results outperformed other algorithms in performance and accuracy. \cite{tian2013fingerprint}
 
-\section{Section 2}
+\begin{definition}\label{def:exemplar}
+	An exemplar is a datapoint that is selected as the center of a cluster.
+\end{definition}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\pagebreak
+\section{Affinity Propagation}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Affinity Propagation works by passing messages between individual nodes in order to cummulate evidence of responsability and availability. The input parameter is the similarity of all nodes. This information is stored in matrices. (See Definition \ref{def:matrices}) Each entry of such a matrix encodes information about point $x_i$ and $x_k$ in the dataset. Affinity Propagation can be used to identify clusters, and their respective exemplars.
+\begin{definition}\label{def:matrices}
+	Matrices used in the Affinity Propagation Algorithm
+	\[
+		\mathsf{Similarity\ Matrix:}\  S(i,k) 
+	\]
+	\[
+		\mathsf{Responsibility\ Matrix:}\  R(i,k) 
+	\]
+	\[
+		\mathsf{Availability\ Matrix:}\  A(i,k) 
+	\]
+\end{definition}
+\subsection{Similarity}
+When talking about clusters an understanding of similarity is needed. Affinity Propagation gets this from $S(i,k)$. This general parameter encodes how suited $x_k$ is to be an exemplar for point $x_i$. Metrics prove to be a good similarity criterion, so as a default the negative squared error can be used as input for the similarity matrix. \cite{frey2007clustering} (See Definition \ref{def:negsquared}) It is important to note that $S$ can take any real values, and if another exemplar-based probability model is available, $S(i,k)$ can be set to the real-valued log-likelihood of $x_i$, given that its exemplar is $x_k$. This correlation is not necessarily symmetric, and can be set by hand if needed. \cite{frey2007clustering}
+\begin{definition}\label{def:negsquared}
+	Negative squared error (euclidin distance)
+	\[
+		S(i,k) = - \norm{x_i - x_k}^2
+	\]
+\end{definition}
+Additionally, the diagonal values $S(k,k)$ of the similarity matrix are special, as they represent how likely it is for $x_k$ to be an exemplar itself. Those values $p_1 .. p_n$ are called preference values:
+\[
+	S(i,k) = \begin{bmatrix}p_{1} & & \\ & \ddots & \\ & & p_{n}\end{bmatrix}
+\]
+Rather than requiring the a priori knowledge about the number of clusters, they emerge from those preference values, and the later explained message passing procedure. If each point is equally likely to be an exemplar, the preference values can be set to a common value $p_1..p_n = p$. A higher preference will yield more clusters, so for a moderate amount, $p$ can be set to the median of all similarities. For a small amount it can be set to the minimum.\cite{frey2007clustering}
 
-
+\subsection{Responsibility}
+One of the two exchanged messages is the so-called responsability $R(i,k)$, sent from $x_i$ to $x_k$. It reflects the accumulated evidence for how well-suited point $x_k$ is to serve as the exemplar for point $x_i$, taking into account other potential exemplars for point $x_i$.\cite{frey2007clustering}
+\subsection{Availability}
+The other exchanged message is called availability $A(i,k)$, send from $x_k$ to $x_i$. It reflects the accumulated evidence for how appropriate it would be for point $x_i$ to choose point $x_k$ as its exemplar, taking into account the support from other points that point $x_k$ should bean exemplar. Both Responsability and Availability can be viewed as log-probability ratios. To initialize the algorithm we set $A(i,k) = 0$.\cite{frey2007clustering}
+\pagebreak
+\subsection{Passing Messages}
+Both $R$ and $A$ serve as message-passing matrices. The actual message exchange is modelled by applying update rules to $R$ and $A$. First, the responsibility is updated according to Definition \ref{def:respupdate}, then the new availability is calculated according to Definition \ref{def:avupdate}.
+\begin{definition}\label{def:respupdate}
+	Updating the Responsibility
+	\[
+		R(i,k) \leftarrow S(i,k) - \underset{k^\prime\, \mathsf{s.t.}\, k^\prime \neq k}{\mathsf{max}} \{A(i,k^\prime) + S(i,k^\prime)\}
+	\]
+\end{definition}
+\begin{definition}\label{def:avupdate}
+	Updating the Availability
+	\[
+		A(i,k) \leftarrow \mathsf{min}\{0,R(k,k) + \sum\limits_{i^\prime\,\mathsf{s.t.}\, i^\prime \notin \{i,k\}}\mathsf{max}\{0, R(i^{\, \prime} ,k)\}\}
+	\]
+\end{definition}
+As points get effectively assigned to an exemplar, their availability will drop below 0, weakening the incoming positive values from the initial similarity. $R(k,k)$, the "Self-Responsibility" can be interpreted as accumulated evidence, that $x_k$ is an exemplar, based on its preference, and how ill-suited it is to serve as an exemplar for other points. \cite{frey2007clustering} While the responsibility updates let candidate exemplars compete for the ownership of a data point, the availability updates gathers evidence wether a each candidate exemplar would be a good one. It is noteworthy that only positive responsibilities are accounted, because a good exemplar only needs to explain some data points well, regardless of how poorly it explains others.\cite{frey2007clustering} The "Self-Availability" $A(k,k)$ reflects accumulated evidence that $x_k$ is an exemplar, based on positive responsibilities sent to it from other points. It needs its own update rule (See Definiton \ref{def:savupdate})
+\begin{definition}\label{def:savupdate}
+	Updating the "Self-Availability"
+	\[
+   		A(k,k) \leftarrow \sum\limits_{i^\prime\, \mathsf{s.t.}\, i^\prime \neq k} \mathsf{max} \{0, R(i^{\, \prime} ,k)\}
+	\]
+\end{definition}
+All of the update rules can be done with simple, local computations.\cite{frey2007clustering}
+\subsection{Retrieving Data}
+At any point during the iterative process, $A$ and $R$ can be combined to identify exemplars. For $x_i$, the $x_k$ maximizing
+\[
+	A(i,k) + R(i,k)
+\]
+eighter identifies $x_i$ as an exemplar if $i=k$ or $x_k$ as an exemplar for $x_i$. \cite{frey2007clustering} For reasonable results the algorithm may be terminated after a fixed number of iterations, after changes in messages fall below a a treshold, or after the local decisions stay constant for some number of iterations.\cite{frey2007clustering}
+\subsection{Numerical Oscillations}
+When passing the messages, numerical oscillations may occur in the matrices. To tackle them, messages must be damped. This is done using a damping factor $\lambda \in \left[0,1\right]$ and applied to each message update. Such a damped message-pass follows Definition \ref{def:dampupdate}. The damping factor may be chosen freely in the interval $[0,1]$, a default value of $\lambda = 0.5$ is specified by Frey et al. \cite{frey2007clustering}
+\begin{definition}\label{def:dampupdate}
+	Updating message matrix $M$ using damping factor $\lambda$
+	\[
+		M^\prime (i,k) =\lambda \cdot M_{\mathsf{old}}(i,k) + (1-\lambda) \cdot M_{\mathsf{new}} (i,k)
+	\]
+\end{definition}
+It is to note that a high damping factor can get rid of oscillations well, but it may slow down the message passing procedure.\cite{wang2008adaptive} Finding an appropriate damping factor is not trivial, Wang et al. propose their Adaptive Affinity Propagation algorithm in order to tackle that, among other things.\cite{wang2008adaptive}
+\pagebreak
+\subsection{Results}
+... Results and tables of affinity propagation.
+\section{Adaptive Affinity Propagation}
+\section{Application: Fingerprint based WLAN position tracking}
 \bibliographystyle{plain}
 \bibliography{../literature/literature}
 
