@@ -2,9 +2,11 @@
 \usepackage{termpaper}
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
+\usepackage{tabularx}
 
 \newtheorem{definition}{Definition}
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
 %opening
 \title{Clustering with Affinity Propagation and its Applications}
 \author{
@@ -65,7 +67,7 @@ Rather than requiring the a priori knowledge about the number of clusters, they 
 \subsection{Responsibility}
 One of the two exchanged messages is the so-called responsability $R(i,k)$, sent from $x_i$ to $x_k$. It reflects the accumulated evidence for how well-suited point $x_k$ is to serve as the exemplar for point $x_i$, taking into account other potential exemplars for point $x_i$.\cite{frey2007clustering}
 \subsection{Availability}
-The other exchanged message is called availability $A(i,k)$, send from $x_k$ to $x_i$. It reflects the accumulated evidence for how appropriate it would be for point $x_i$ to choose point $x_k$ as its exemplar, taking into account the support from other points that point $x_k$ should bean exemplar. Both Responsability and Availability can be viewed as log-probability ratios. To initialize the algorithm we set $A(i,k) = 0$.\cite{frey2007clustering}
+The other exchanged message is called availability $A(i,k)$, send from $x_k$ to $x_i$. It reflects the accumulated evidence for how appropriate it would be for point $x_i$ to choose point $x_k$ as its exemplar, taking into account the support from other points that point $x_k$ should bean exemplar. Both Responsability and Availability can be viewed as log-probability ratios. To initialize the algorithm $A$ is set to $A(i,k) = 0$.\cite{frey2007clustering}
 \pagebreak
 \subsection{Passing Messages}
 Both $R$ and $A$ serve as message-passing matrices. The actual message exchange is modelled by applying update rules to $R$ and $A$. First, the responsibility is updated according to Definition \ref{def:respupdate}, then the new availability is calculated according to Definition \ref{def:avupdate}.
@@ -105,10 +107,74 @@ When passing the messages, numerical oscillations may occur in the matrices. To 
 \end{definition}
 It is to note that a high damping factor can get rid of oscillations well, but it may slow down the message passing procedure.\cite{wang2008adaptive} Finding an appropriate damping factor is not trivial, Wang et al. propose their Adaptive Affinity Propagation algorithm in order to tackle that, among other things.\cite{wang2008adaptive}
 \pagebreak
+\subsection{Advantages}
+As already mentioned, clusters and exempars in Affinity Propagation emerege out of the preference values and message-passing process natuarlly. It is not required to supply the dedicated number of expected clusters like for e.g. k-centers clustering.\cite{frey2007clustering}
+
+Additionally Affinity Propagation can also operate on unusual, non-metric spaces. The similarity matrix does not need to be symmetric (See Definition \ref{def:symmetric}), and the similarities do not have to satisfy the triangle inequality. (See Definition \ref{def:triangleieq})\cite{frey2007clustering}
+
+Given that, Affinity Propagation is in some senses more versatile than classical approaches. An example where those (missing) constraints are used was conducted by Frey et al. in \cite{frey2007clustering} where they tried to cluster sentences, with similarity $S(i,k)$ based on the cost of encoding words in sentence $i$ with words of sentence $k$. 97\% of the resulting similarities where non-symmetric.\cite{frey2007clustering} 
+\begin{definition}\label{def:symmetric}
+	Similarities do not have to be symmetric: $S(i,k) = S(k,i)$.
+\end{definition}
+\begin{definition}\label{def:triangleieq}
+	Similarities do not have to satisfy the triangle inequality: $S(i,k) < S(i,j) + S(j,k)$
+\end{definition}
 \subsection{Results}
-... Results and tables of affinity propagation.
+Frey et al. conducted a series of experiments to compare Affinity Propagation k-centers clustering. For a complete list see\cite{frey2007clustering}.
+\subsubsection{Face Images}
+A classic problem is image clustering. To study this, Affinity Propagation was applied on 900 grey-scale images of faces. The results show, that even after a large amount of re-runs Affinity Propagation has a lower squared error, compared to k-centers clustering. Affinity Propagation uniformly achieved a much lower error in more than two orders of magnitude less time.\cite{frey2007clustering}
+
+When using a different error metric on this problem, namely absolute pixel distance, Affinity Propagation also uniformly outperformed k-centers clustering. \cite{frey2007clustering}
+\subsubsection{Clustering Putative Exons}
+When trying to find genes, clustering of putative exons plays a huge role.\cite{frey2007clustering} It is interesting to see how Affinity Propagation performs here, because the similarity matrix derived from mined DNA sequences is sparse. In this task one run of Affinity Propagation was run once and took 6 minutes, while 10.000 runs of k-centers clustering took 208 hours. The results show a hight True Positive rate of 39\% at a False Positive rate of 3\%. k-centers did not nearly perform as well, at only a TP rate of 17\%. It is to note that a more sophisticated tool with additional biological knowledge could achieve a TP rate of 43\% at the same FP rate.\cite{frey2007clustering}
+\pagebreak
 \section{Adaptive Affinity Propagation}
+As already mentioned, the message-passing process in Affinity Propagation can lead to numerical oscillations, which cannot be eliminated automatically. Choosing a high value for the damping factor $\lambda$, will indeed get rid of oscillations in most cases, but also slows down the message-passing part of the algorithm. Additionally, optimal preference values depend not only on measures of similarity, but also the structure of the data set, and the desired outcome. While the median of all similarities is a good value for a common preference value $p$, it does not account for said factors. Wang et al. propose their "adaptive" version of the Affinity Propagation value, in order to overcome the limitations of numerical oscillations, and adaptively change both the damping factor $\lambda$ and the preference value $p$.\cite{wang2008adaptive}
+
+Adaptive AP proposes methods to adaptively change the damping factor in order to eliminate oscillations (Adaptive Damping), to adaptively change the preference values to escape oscillations if that fails (Adaptive Escape) and adaptively searching the space of $p$ to find an optimal clustering solution suitable for the data set (Adaptive Preference scanning)
+\subsection{Overcoming numerical oscillations}
+A trivial solution to get rid of oscillations and achieve convergance is to use a high damping factor ($\lambda$ close to $1$), which will cause the algorithm to converge, but run very slow.\cite{wang2008adaptive}
+
+Another solution is to re-run AP with different damping factors if the model fails to converge in the beginning. That requires to repeat the whole message-passing part many times, and will also consume a lot of time and ressources.\cite{wang2008adaptive}
+
+\subsubsection{Adaptive Damping}
+The proposed method scans for occurances of non-oscillating features (See Definition \ref{def:nonosc}) in a sliding window of size $w$. (Because detecting oscillations is generally harder, than detecting those non-oscillating features) If oscillations are detected, $\lambda$ is increased by a step (e.g. $\lambda_\Delta = 0.05$). If the number of non-oscillating features is less than two-thirds of the window size, oscillations are detected. This is a tolerant design and accounts for occasional vibrations, as well as initial oscillations in the first iterations.\cite{wang2008adaptive} If this technique fails to get rid of the oscillations and $\lambda$ reaches a threshold (e.g. $\lambda_{\mathsf{max}} = 0.85$) it means that the adaptive damping failed, and $p$ is changed instead, in the Adaptive Escape method described below.
+\begin{definition}\label{def:nonosc}
+	Non-Oscillating feature: The number of exemplars is decreasning or unchanged in the iterative process.\cite{wang2008adaptive}
+\end{definition}
+\subsubsection{Adaptive Escape}
+When adaptive damping alone fails, another way to escape oscillations is to decrease $p$, which will yield less clusters and eliminate oscillations according to Definition \ref{def:nonosc}. The adaptive escape is used when $\lambda$ reaches its threshold $\lambda_{\mathsf{max}}$, and decreases the preference value $p$ by $p_{\Delta}$.\cite{wang2008adaptive} This is used in combination with the Adaptive Preference Scanning technique described below.
+\subsection{Adaptive Preference Scanning}
+Additionally, the new proposed method is able to search through different values of $p$ in order to find better solutions. This requires to adaptively adjust $p$ throughout the algorithm, to obtain different results. Those are then compared using the silhouette index\cite{ROUSSEEUW198753} as a validity index. It is crucial for both performance and results, that step sizes for $p$, as well as window sizes are chosen accordingly. Wang et al. derived reasonable limits and default values for all of those in \cite{wang2008adaptive}.
+\pagebreak
+\subsection{Results}
+The following table (Table \ref{tbl:adapres}) shows a comparison between Affinity Propagation (AP) and adaptive Affinity Propagation (adAP). The results show that adAP performs better and comes closer to the actual know cluster numbers. It can indeed eliminate oscillations when they occur. One can also see, that the additional escape and scanning techniques do contribute a significant time overhead, which is a tradeoff in order to achieve better results.
+\begin{table}[h]
+	\begin{center}
+		\begin{tabularx}{\textwidth}{@{}YYYYYYYYYY@{}}
+			\hline
+			Data sets&known NC  &adAP NC  &adAP error (\%) & adAP FM  &adAP time(s) & adAP eliminate oscillations  & AP NC  & AP FM  & AP time(s)  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  &  \\
+			&  &  &  &  &  &  &  &  & 
+		\end{tabularx}
+	\end{center}
+	
+	\caption{Table the table}
+	\label{tbl:adapres}
+\end{table}
+\pagebreak
 \section{Application: Fingerprint based WLAN position tracking}
+\section{Conclusion}
 \bibliographystyle{plain}
 \bibliography{../literature/literature}
 
