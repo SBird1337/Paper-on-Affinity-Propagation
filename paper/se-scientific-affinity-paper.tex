@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
 \usepackage{tabularx}
+\usepackage{graphicx}
 
 \newtheorem{definition}{Definition}
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}
@@ -28,16 +29,16 @@ When working on data-sets a crucial step is often to cluster the data points. To
 
 Finding groups in data is an important step in many fields of computer science, and already there exist algorithms to solve these problems. One solution to this is the popular k-means, or k-centers algorithm, which iteratively refines a randomly selected initial set of clusters. This method comes with the constraint that a user has to specify the initial amount of clusters, and is very sensitive to that parameter. \cite{frey2007clustering} 
 Affinity Propagation is a clustering algorithm proposed by Frey et al. in 2007. It uses a message passing model between data points to form a collection of exemplars (See Definition \ref{def:exemplar}) and respective clusters. \cite{frey2007clustering} Affinity Propagation tries to solve the problem without needing to know the number of clusters beforehand, by only supplying a similarity criterion.
-While the proposed method performs better for many tested applications \cite{frey2007clustering} and has very good general applicability, there are a number of problems that occur when strictly following the procedure, one of them being numerical oscillations in the message passing procedure. Wang et al. try to tackle this with their adaptive version of the algorithm, which changes parameters on the fly, to achieve better results and convergance times. \cite{wang2008adaptive} With the original implemetation of Affinity Propagation and some further improvements, the procedure promises to be a valid applicant to tackle modern problems that require a form of uninformed clustering on different data sets. Tian et al. propose a probability distribution-aided algorithm to perform fingerprint indoor positioning in WLAN networks, which is based on an initial Affinity Propagation Clustering. Their results outperformed other algorithms in performance and accuracy. \cite{tian2013fingerprint}
+While the proposed method performs better for many tested applications \cite{frey2007clustering} and has very good general applicability, there are a number of problems that occur when strictly following the procedure, one of them being numerical oscillations in the message passing procedure. Wang et al. try to tackle this with their adaptive version of the algorithm, which changes parameters on the fly, to achieve better results and convergence times. \cite{wang2008adaptive} With the original implementation of Affinity Propagation and some further improvements, the procedure promises to be a valid applicant to tackle modern problems that require a form of uninformed clustering on different data sets. Tian et al. propose a probability distribution-aided algorithm to perform fingerprint indoor positioning in WLAN networks, which is based on an initial Affinity Propagation Clustering. Their results outperformed other algorithms in performance and accuracy. \cite{tian2013fingerprint}
 
 \begin{definition}\label{def:exemplar}
-	An exemplar is a datapoint that is selected as the center of a cluster.
+	An exemplar is a data point that is selected as the center of a cluster.
 \end{definition}
 
 \pagebreak
 \section{Affinity Propagation}
 
-Affinity Propagation works by passing messages between individual nodes in order to cummulate evidence of responsability and availability. The input parameter is the similarity of all nodes. This information is stored in matrices. (See Definition \ref{def:matrices}) Each entry of such a matrix encodes information about point $x_i$ and $x_k$ in the dataset. Affinity Propagation can be used to identify clusters, and their respective exemplars.
+Affinity Propagation works by passing messages between individual nodes in order to cumulative evidence of responsibility and availability. The input parameter is the similarity of all nodes. This information is stored in matrices. (See Definition \ref{def:matrices}) Each entry of such a matrix encodes information about point $x_i$ and $x_k$ in the data set. Affinity Propagation can be used to identify clusters, and their respective exemplars.
 \begin{definition}\label{def:matrices}
 	Matrices used in the Affinity Propagation Algorithm
 	\[
@@ -53,7 +54,7 @@ Affinity Propagation works by passing messages between individual nodes in order
 \subsection{Similarity}
 When talking about clusters an understanding of similarity is needed. Affinity Propagation gets this from $S(i,k)$. This general parameter encodes how suited $x_k$ is to be an exemplar for point $x_i$. Metrics prove to be a good similarity criterion, so as a default the negative squared error can be used as input for the similarity matrix. \cite{frey2007clustering} (See Definition \ref{def:negsquared}) It is important to note that $S$ can take any real values, and if another exemplar-based probability model is available, $S(i,k)$ can be set to the real-valued log-likelihood of $x_i$, given that its exemplar is $x_k$. This correlation is not necessarily symmetric, and can be set by hand if needed. \cite{frey2007clustering}
 \begin{definition}\label{def:negsquared}
-	Negative squared error (euclidin distance)
+	Negative squared error (euclidean distance)
 	\[
 		S(i,k) = - \norm{x_i - x_k}^2
 	\]
@@ -65,9 +66,9 @@ Additionally, the diagonal values $S(k,k)$ of the similarity matrix are special,
 Rather than requiring the a priori knowledge about the number of clusters, they emerge from those preference values, and the later explained message passing procedure. If each point is equally likely to be an exemplar, the preference values can be set to a common value $p_1..p_n = p$. A higher preference will yield more clusters, so for a moderate amount, $p$ can be set to the median of all similarities. For a small amount it can be set to the minimum. \cite{frey2007clustering}
 
 \subsection{Responsibility}
-One of the two exchanged messages is the so-called responsability $R(i,k)$, sent from $x_i$ to $x_k$. It reflects the accumulated evidence for how well-suited point $x_k$ is to serve as the exemplar for point $x_i$, taking into account other potential exemplars for point $x_i$. \cite{frey2007clustering}
+One of the two exchanged messages is the so-called responsibility $R(i,k)$, sent from $x_i$ to $x_k$. It reflects the accumulated evidence for how well-suited point $x_k$ is to serve as the exemplar for point $x_i$, taking into account other potential exemplars for point $x_i$. \cite{frey2007clustering}
 \subsection{Availability}
-The other exchanged message is called availability $A(i,k)$, sent from $x_k$ to $x_i$. It reflects the accumulated evidence for how appropriate it would be for point $x_i$ to choose point $x_k$ as its exemplar, taking into account the support from other points that point $x_k$ should be an exemplar. Both Responsability and Availability can be viewed as log-probability ratios. To initialize the algorithm $A$ is set to $A(i,k) = 0$. \cite{frey2007clustering}
+The other exchanged message is called availability $A(i,k)$, sent from $x_k$ to $x_i$. It reflects the accumulated evidence for how appropriate it would be for point $x_i$ to choose point $x_k$ as its exemplar, taking into account the support from other points that point $x_k$ should be an exemplar. Both Responsibility and Availability can be viewed as log-probability ratios. To initialize the algorithm $A$ is set to $A(i,k) = 0$. \cite{frey2007clustering}
 \pagebreak
 \subsection{Passing Messages}
 Both $R$ and $A$ serve as message-passing matrices. The actual message exchange is modelled by applying update rules to $R$ and $A$. First, the responsibility is updated according to Definition \ref{def:respupdate}, then the new availability is calculated according to Definition \ref{def:avupdate}.
@@ -83,7 +84,7 @@ Both $R$ and $A$ serve as message-passing matrices. The actual message exchange 
 		A(i,k) \leftarrow \mathsf{min}\{0,R(k,k) + \sum\limits_{i^\prime\,\mathsf{s.t.}\, i^\prime \notin \{i,k\}}\mathsf{max}\{0, R(i^{\, \prime} ,k)\}\}
 	\]
 \end{definition}
-As points get effectively assigned to an exemplar, their availability will drop below 0, weakening the incoming positive values from the initial similarity. $R(k,k)$, the "Self-Responsibility" can be interpreted as accumulated evidence, that $x_k$ is an exemplar, based on its preference, and how ill-suited it is to serve as an exemplar for other points. \cite{frey2007clustering} While the responsibility updates let candidate exemplars compete for the ownership of a data point, the availability updates gather evidence whether a candidate exemplar would be a good one. It is noteworthy that only positive responsibilities are accounted for, because a good exemplar only needs to explain some data points well, regardless of how poorly it explains others. \cite{frey2007clustering} The "Self-Availability" $A(k,k)$ reflects accumulated evidence that $x_k$ is an exemplar, based on positive responsibilities sent to it from other points. It needs its own update rule (See Definiton \ref{def:savupdate})
+As points get effectively assigned to an exemplar, their availability will drop below 0, weakening the incoming positive values from the initial similarity. $R(k,k)$, the "Self-Responsibility" can be interpreted as accumulated evidence, that $x_k$ is an exemplar, based on its preference, and how ill-suited it is to serve as an exemplar for other points. \cite{frey2007clustering} While the responsibility updates let candidate exemplars compete for the ownership of a data point, the availability updates gather evidence whether a candidate exemplar would be a good one. It is noteworthy that only positive responsibilities are accounted for, because a good exemplar only needs to explain some data points well, regardless of how poorly it explains others. \cite{frey2007clustering} The "Self-Availability" $A(k,k)$ reflects accumulated evidence that $x_k$ is an exemplar, based on positive responsibilities sent to it from other points. It needs its own update rule (See Definition \ref{def:savupdate})
 \begin{definition}\label{def:savupdate}
 	Updating the "Self-Availability"
 	\[
@@ -96,7 +97,16 @@ At any point during the iterative process, $A$ and $R$ can be combined to identi
 \[
 	A(i,k) + R(i,k)
 \]
-eighter identifies $x_i$ as an exemplar if $i=k$ or $x_k$ as an exemplar for $x_i$. \cite{frey2007clustering} For reasonable results the algorithm may be terminated after a fixed number of iterations, after changes in messages fall below a a treshold, or after the local decisions stay constant for some number of iterations. \cite{frey2007clustering}
+either identifies $x_i$ as an exemplar if $i=k$ or $x_k$ as an exemplar for $x_i$. \cite{frey2007clustering} For reasonable results the algorithm may be terminated after a fixed number of iterations, after changes in messages fall below a a threshold, or after the local decisions stay constant for some number of iterations. \cite{frey2007clustering}
+
+A visualized form of the message-passing procedure can be seen in Figure \ref{fig:iterations}, where you can see how each point gradually chooses its exemplar.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{../figures/frey-dueck-cluster.jpg}
+	\caption{Visualized message-passing procedure \cite{frey2007clustering} showing the likelihood of a point being an exemplar, and its exemplar-relation to other points.}
+	\label{fig:iterations}
+\end{figure}
+\pagebreak
 \subsection{Numerical Oscillations}
 When passing the messages, numerical oscillations may occur in the matrices. To tackle them, messages must be damped. This is done using a damping factor $\lambda \in \left[0,1\right]$ and applied to each message update. Such a damped message-pass follows Definition \ref{def:dampupdate}. The damping factor may be chosen freely in the interval $[0,1]$, a default value of $\lambda = 0.5$ is specified by Frey et al. \cite{frey2007clustering}
 \begin{definition}\label{def:dampupdate}
@@ -108,7 +118,7 @@ When passing the messages, numerical oscillations may occur in the matrices. To 
 It is to note that a high damping factor can get rid of oscillations well, but it may slow down the message passing procedure. \cite{wang2008adaptive} Finding an appropriate damping factor is not trivial, Wang et al. propose their Adaptive Affinity Propagation algorithm in order to tackle that, among other things. \cite{wang2008adaptive}
 \pagebreak
 \subsection{Advantages}
-As already mentioned, clusters and exempars in Affinity Propagation emerege out of the preference values and message-passing process natuarlly. It is not required to supply the dedicated number of expected clusters like for e.g. k-centers clustering. \cite{frey2007clustering}
+As already mentioned, clusters and exemplars in Affinity Propagation emerge out of the preference values and message-passing process naturally. It is not required to supply the dedicated number of expected clusters like for e.g. k-centers clustering. \cite{frey2007clustering}
 
 Additionally Affinity Propagation can also operate on unusual, non-metric spaces. The similarity matrix does not need to be symmetric (See Definition \ref{def:symmetric}), and the similarities do not have to satisfy the triangle inequality. (See Definition \ref{def:triangleieq}) \cite{frey2007clustering}
 
@@ -133,14 +143,14 @@ As already mentioned, the message-passing process in Affinity Propagation can le
 
 Adaptive AP proposes methods to adaptively change the damping factor in order to eliminate oscillations (Adaptive Damping), to adaptively change the preference values to escape oscillations if that fails (Adaptive Escape) and adaptively searching the space of $p$ to find an optimal clustering solution suitable for the data set (Adaptive Preference scanning)
 \subsection{Overcoming numerical oscillations}
-A trivial solution to get rid of oscillations and achieve convergance is to use a high damping factor ($\lambda$ close to $1$), which will cause the algorithm to converge, but run very slow. \cite{wang2008adaptive}
+A trivial solution to get rid of oscillations and achieve convergence is to use a high damping factor ($\lambda$ close to $1$), which will cause the algorithm to converge, but run very slow. \cite{wang2008adaptive}
 
-Another solution is to re-run AP with different damping factors if the model fails to converge in the beginning. That requires to repeat the whole message-passing part many times, and will also consume a lot of time and ressources. \cite{wang2008adaptive}
+Another solution is to re-run AP with different damping factors if the model fails to converge in the beginning. That requires to repeat the whole message-passing part many times, and will also consume a lot of time and resources. \cite{wang2008adaptive}
 
 \subsubsection{Adaptive Damping}
-The proposed method scans for occurances of non-oscillating features (See Definition \ref{def:nonosc}) in a sliding window of size $w$. (Because detecting oscillations is generally harder, than detecting those non-oscillating features) If oscillations are detected, $\lambda$ is increased by a step (e.g. $\lambda_\Delta = 0.05$). If the number of non-oscillating features is less than two-thirds of the window size, oscillations are detected. This is a tolerant design and accounts for occasional vibrations, as well as initial oscillations in the first iterations. \cite{wang2008adaptive} If this technique fails to get rid of the oscillations and $\lambda$ reaches a threshold (e.g. $\lambda_{\mathsf{max}} = 0.85$) it means that the adaptive damping failed, and $p$ is changed instead, in the Adaptive Escape method described below.
+The proposed method scans for occurrences of non-oscillating features (See Definition \ref{def:nonosc}) in a sliding window of size $w$. (Because detecting oscillations is generally harder, than detecting those non-oscillating features) If oscillations are detected, $\lambda$ is increased by a step (e.g. $\lambda_\Delta = 0.05$). If the number of non-oscillating features is less than two-thirds of the window size, oscillations are detected. This is a tolerant design and accounts for occasional vibrations, as well as initial oscillations in the first iterations. \cite{wang2008adaptive} If this technique fails to get rid of the oscillations and $\lambda$ reaches a threshold (e.g. $\lambda_{\mathsf{max}} = 0.85$) it means that the adaptive damping failed, and $p$ is changed instead, in the Adaptive Escape method described below.
 \begin{definition}\label{def:nonosc}
-	Non-Oscillating feature: The number of exemplars is decreasning or unchanged in the iterative process. \cite{wang2008adaptive}
+	Non-Oscillating feature: The number of exemplars is decreasing or unchanged in the iterative process. \cite{wang2008adaptive}
 \end{definition}
 \subsubsection{Adaptive Escape}
 When adaptive damping alone fails, another way to escape oscillations is to decrease $p$, which will yield less clusters and eliminate oscillations according to Definition \ref{def:nonosc}. The adaptive escape is used when $\lambda$ reaches its threshold $\lambda_{\mathsf{max}}$, and decreases the preference value $p$ by $p_{\Delta}$. \cite{wang2008adaptive} This is used in combination with the Adaptive Preference Scanning technique described below.
@@ -148,7 +158,7 @@ When adaptive damping alone fails, another way to escape oscillations is to decr
 Additionally, the new proposed method is able to search through different values of $p$ in order to find better solutions. This requires to adaptively adjust $p$ throughout the algorithm, to obtain different results. Those are then compared using the silhouette index \cite{ROUSSEEUW198753} as a validity index. It is crucial for both performance and results, that step sizes for $p$, as well as window sizes are chosen accordingly. Wang et al. derived reasonable limits and default values for all of those in \cite{wang2008adaptive}.
 \pagebreak
 \subsection{Results}
-The following table (Table \ref{tbl:adapres}) shows a comparison between Affinity Propagation (AP) and adaptive Affinity Propagation (adAP). The results show that adAP performs better and comes closer to the actual know cluster numbers. It can indeed eliminate oscillations when they occur. One can also see, that the additional escape and scanning techniques do contribute a significant time overhead, which is a tradeoff in order to achieve better results. Table \ref{tbl:adapres} also shows that adaptive Affinity Propagation performs best compared to regular AP when it is able to detect and eliminate oscillations.
+The following table (Table \ref{tbl:adapres}) shows a comparison between Affinity Propagation (AP) and adaptive Affinity Propagation (adAP). The results show that adAP performs better and comes closer to the actual know cluster numbers. It can indeed eliminate oscillations when they occur. One can also see, that the additional escape and scanning techniques do contribute a significant time overhead, which is a trade off in order to achieve better results. Table \ref{tbl:adapres} also shows that adaptive Affinity Propagation performs best compared to regular AP when it is able to detect and eliminate oscillations.
 \begin{table}[h]
 	\begin{center}
 		\begin{tabularx}{\textwidth}{@{}XYYYYYYYYY@{}}
