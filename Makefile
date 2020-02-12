@@ -14,4 +14,4 @@ cleanaux:
 	make -C presentation cleanaux
 
 package: all cleanaux
-	tar -czf se-scientific.tar.gz presentation/ paper/ examples/ figures/ literature/ scripts/ v2-remarks.md
+	tar -czf se-scientific.tar.gz presentation/ paper/ examples/ figures/ literature/ scripts/ v2-remarks.md v3-remarks.md
