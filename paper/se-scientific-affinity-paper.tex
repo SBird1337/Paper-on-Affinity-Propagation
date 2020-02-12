@@ -29,9 +29,9 @@
 
 \section{Introduction}
 
-Finding groups in data is an important step in many fields of computer science, and already there exist algorithms to solve this problem. One solution to this is the popular k-means \cite{hartigan1975clustering}, or k-centers algorithm, which iteratively refines a randomly selected initial set of clusters. This method comes with the constraint that a user has to specify the initial amount of clusters, and is very sensitive to that parameter.
+Finding groups in data is an important step in many fields of computer science, and there already exist algorithms to solve this problem. One solution to this is the popular k-means \cite{hartigan1975clustering}, or k-centers algorithm, which iteratively refines a randomly selected initial set of clusters. This method comes with the constraint that a user has to specify the initial amount of clusters, and is very sensitive to that parameter.
 Affinity Propagation \cite{frey2007clustering} is a clustering algorithm proposed by Frey et al. in 2007. It uses a message passing model between data points to form a collection of exemplars (See Definition \ref{def:exemplar}) and respective clusters. Affinity Propagation tries to solve the problem without needing to know the number of clusters beforehand, by only supplying a similarity criterion.
-While the proposed method performs better for many tested applications and has very good general applicability, there are a number of problems that occur when strictly following the procedure, one of them being numerical oscillations in the message passing procedure. In \cite{wang2008adaptive} Wang et al. try to tackle this with their adaptive version of the algorithm, which changes parameters on the fly, to achieve better results and convergence times. With the original implementation of Affinity Propagation and some further improvements, the procedure promises to be a valid applicant to tackle modern problems that require a form of uninformed clustering on different data sets. In \cite{tian2013fingerprint} Tian et al. propose a probability distribution-aided algorithm to perform fingerprint indoor positioning in WLAN networks, which is based on an initial Affinity Propagation Clustering. Their results outperformed other algorithms in performance and accuracy.
+While the proposed method performs better for many tested applications and has very good general applicability, there are a number of problems that occur when strictly following the procedure, one of them being numerical oscillations in the message passing procedure. In \cite{wang2008adaptive} Wang et al. try to tackle this with their adaptive version of the algorithm, which changes parameters on the fly, to achieve better results and convergence times. With the original implementation of Affinity Propagation and some further improvements, the procedure promises to be a valid applicant to tackle modern problems which require a form of uninformed clustering on different data sets. In \cite{tian2013fingerprint} Tian et al. propose a probability distribution-aided algorithm to perform fingerprint indoor positioning in WLAN networks, which is based on an initial Affinity Propagation Clustering. Their results outperformed other algorithms in performance and accuracy.
 
 \begin{definition}\label{def:exemplar}
 	An exemplar is a data point that is selected as the center of a cluster.
@@ -112,9 +112,9 @@ A visualized form of the message-passing procedure can be seen in Figure \ref{fi
 \begin{algorithm}[h!]
 	\label{lst:pseudoap}
 	\KwData{Data points $x_k$}
-	\KwResult{Local search minima of the energy functions for responsability and availability}
+	\KwResult{Local search minima of the energy functions for responsibility and availability}
 	Initialize similarity S to an appropriate similarity criterion\;
-	Initialize responsabilities R=0\;
+	Initialize responsibilities R=0\;
 	Initialize availabilites A=0\;
 	\While{No termination criterion is met}{
 		Update the responsabilities according to Definition \ref{def:respupdate} with damping factor $\lambda$\;
@@ -154,7 +154,7 @@ When using a different error metric on this problem, namely absolute pixel dista
 	Mean Squared Error: $E = \frac{1}{M N}\sum\limits_{n=1}^{N}\sum\limits_{m=1}^{M} \left[g(n,m) - g^\prime (n,m)\right]^2$ for images $g$ and $g^\prime$
 \end{definition}
 \subsubsection{Clustering Putative Exons}
-When trying to find genes, clustering of putative exons plays a huge role. It is interesting to see how Affinity Propagation performs here, because the similarity matrix derived from mined DNA sequences is sparse. In this task one run of Affinity Propagation was run once and took 6 minutes, while 10.000 runs of k-centers clustering took 208 hours. The results show a high True Positive rate of 39\% at a False Positive rate of 3\%. k-centers did not nearly perform as well, at only a TP rate of 17\%. It is to note that a more sophisticated tool with additional biological knowledge could achieve a TP rate of 43\% at the same FP rate.
+When trying to find genes, clustering of putative exons plays a huge role. It is interesting to see how Affinity Propagation performs here, because the similarity matrix derived from mined DNA sequences is sparse. In this task one run of Affinity Propagation took 6 minutes, while 10.000 runs of k-centers clustering took 208 hours. The results show a high True Positive rate of 39\% at a False Positive rate of 3\%. k-centers did not nearly perform as well, at only a TP rate of 17\%. It is to note that a more sophisticated tool with additional biological knowledge could achieve a TP rate of 43\% at the same FP rate.
 
 \section{Adaptive Affinity Propagation}
 As already mentioned, the message-passing process in Affinity Propagation can lead to numerical oscillations, which cannot be eliminated automatically. Choosing a high value for the damping factor $\lambda$, will indeed get rid of oscillations in most cases, but also slows down the message-passing part of the algorithm. Additionally, optimal preference values depend not only on measures of similarity, but also the structure of the data set, and the desired outcome. While the median of all similarities is a good value for a common preference value $p$, it does not account for said factors. In \cite{wang2008adaptive} Wang et al. propose their "adaptive" version of the Affinity Propagation algorithm, in order to overcome the limitations of numerical oscillations, and adaptively change both the damping factor $\lambda$ and the preference value $p$. In this section we will follow their paper.
@@ -178,7 +178,7 @@ Additionally, the new proposed method is able to search through different values
 	The silhouette index $S$ is calculated using the mean intra-cluster distance $a(k)$, and the mean nearest-cluster distance $b(k)$: $S(k) = \frac{b(i)-a(i)}{\mathsf{max}\left\{a(i),b(i)\right\}}$, as seen in \cite{wang2008adaptive}.
 \end{definition}
 \subsection{Results}
-The following table (Table \ref{tbl:adapres}) shows a comparison between Affinity Propagation (AP) and adaptive Affinity Propagation (adAP). The results show that adAP performs better and comes closer to the actual know cluster numbers. It can indeed eliminate oscillations when they occur. One can also see, that the additional escape and scanning techniques do contribute a significant time overhead, which is a trade off in order to achieve better results. Table \ref{tbl:adapres} also shows that adaptive Affinity Propagation performs best compared to regular AP when it is able to detect and eliminate oscillations.
+The following table (Table \ref{tbl:adapres}) shows a comparison between Affinity Propagation (AP) and Adaptive Affinity Propagation (adAP). The results show that adAP performs better and comes closer to the actual know cluster numbers. It can indeed eliminate oscillations when they occur. One can also see, that the additional escape and scanning techniques do contribute a significant time overhead, which is a trade off in order to achieve better results. Table \ref{tbl:adapres} also shows that Adaptive Affinity Propagation performs best compared to regular AP when it is able to detect and eliminate oscillations.
 \begin{table}[h]
 	\begin{center}
 		\begin{tabularx}{\textwidth}{@{}XYYYYYYYYY@{}}
